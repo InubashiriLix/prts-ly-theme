@@ -20,15 +20,20 @@ local function wordmark(ctx, t, C)
     end
 end
 
+local function accent(C, mode)
+    return mode == "cyan" and C.cyan or C.orange
+end
+
 function M.draw(ctx, b, t, C)
+    local highlight = accent(C, t.accent_mode)
     if b.mode == "compact" then
         ctx:rule(1, 1, b.w-2, C.muted)
         ctx:text(2, 2, "PRTS / ANALYSIS OS", C.bold)
         ctx:rule(1, b.h-2, b.w-2, C.muted)
         return
     end
-    ctx:bar(2, 2, 3, "", C.orange, C.orange)
-    if b.mode == "full" then
+    ctx:bar(2, 2, 3, "", highlight, highlight)
+    if b.mode == "full" and t.density ~= "sparse" then
         wordmark(ctx, t, C)
         ctx:text(33, 2, "A N A L Y S I S  O S", C.bold)
         ctx:text(33, 4, "SYNTHESIZE INFORMATION", C.muted)
@@ -45,15 +50,17 @@ function M.draw(ctx, b, t, C)
         local width = b.w-b.right-3
         local rows = {"> TERMINAL INTERFACE", "> DISPLAY INITIALIZED", "> AWAITING OPERATOR"}
         for i, text in ipairs(rows) do
-            local reveal = math.min(1, math.max(0, t.panels*3-(i-1)))
-            ctx:bar(b.right, math.floor(b.h/2)-3+(i-1)*2,
-                    math.floor(width*reveal), text, C.white, C.ink)
+            if t.density ~= "sparse" and (t.density == "dense" or i <= 3) then
+                local reveal = math.min(1, math.max(0, t.panels*3-(i-1)))
+                ctx:bar(b.right, math.floor(b.h/2)-3+(i-1)*2,
+                        math.floor(width*reveal), text, C.white, C.ink)
+            end
         end
         if t.ready then
             local y = math.floor(b.h/2)+4
             ctx:rule(b.right, y, width, C.grid)
             local offset = t.moving and math.floor(t.seconds*4)%math.max(1,width) or 0
-            ctx:cell(b.right+offset, y, 0x2588, C.orange)
+            ctx:cell(b.right+offset, y, 0x2588, highlight)
             ctx:text(b.right, y+2, "IDENTIFY YOURSELF", C.muted)
         end
     end

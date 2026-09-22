@@ -147,7 +147,7 @@ ly = {
 
     -- 右上角时钟的格式字符串（参见 strftime 规范）。示例：%c
     -- 若为 null，则不显示时钟
-    clock = nil,
+    clock = "%H:%M:%S",
 
     -- CMatrix 动画前景色
     cmatrix_fg = 0x0000FF00,
@@ -207,7 +207,7 @@ ly = {
     corner_top_left = "shutdown,restart,password",
 
     -- 右上角
-    corner_top_right = "clock",
+    corner_top_right = "clock,tty",
 
     -- 对于自定义快捷键：每行自定义快捷键在换行前的字符数上限。
     -- 若为 null，则默认使用终端宽度。
@@ -336,7 +336,7 @@ ly = {
 
     -- 信息行上显示的初始文本
     -- 若为 null，信息行默认显示主机名
-    initial_info_text = "IDENTIFY YOURSELF, DOCTOR.",
+    initial_info_text = "PRIESTESS LINK // MEMORY AWAKENED.",
 
     -- 输入框长度。20 可让 Ly 自身的主框落入 40 列的救援 TTY。
     input_len = 20,
@@ -478,6 +478,12 @@ ly = {
     --     name = "custom command $brightness_up",
     --     cmd = "touch /tmp/ly.gaming",
     -- },
+
+    custom_commands = {
+        binding = "F8",
+        name = "PRTS diagnostic channel",
+        cmd = "printf 'PRTS // DIAGNOSTIC CHANNEL READY'",
+    },
 
     custom_labels = {
         label = "prts",

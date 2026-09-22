@@ -38,6 +38,21 @@ sudo ./tools/install.sh               # 安装到 /etc/ly
 再复制构建产物。备份路径会输出到终端。安装器不重启服务。
 直接复制 `src` 不能运行：源码中的模块需要先打包。
 
+## 字体
+
+Ly 没有字体选项：内核控制台只能用 `/etc/vconsole.conf` 的点阵字体，
+想要接近预览图的 TrueType 观感需切换到 KMSCON VT。
+
+```sh
+sudo ./tools/kmscon.sh status     # 查看当前状态
+sudo ./tools/kmscon.sh trial      # 在 tty3 试跑，不动正在使用的 tty
+sudo ./tools/kmscon.sh enable     # 正式切到 tty1 的 KMSCON
+sudo ./tools/kmscon.sh disable    # 回滚到内核控制台
+```
+
+字体与字号在 `/etc/kmscon/kmscon.conf` 配置。原理、已知问题和回滚见
+[字体与 KMSCON](docs/kmscon.md)。
+
 ## 修改与扩展
 
 `src/animation/anime.lua` 是简短的入口，组件使用普通 Lua 模块写法。
@@ -81,6 +96,13 @@ return M
 绘制必须经过 `ctx`，由它保证坐标有效和登录框避让。
 文本使用 ASCII，几何符号通过 `ctx:cell` 传 Unicode 码点。
 配色修改若涉及 Ly 原生表单，也要同步 `src/config.lua`。
+
+更多设计、动画和运维说明：
+
+- [图标设计](docs/icon-design.md)
+- [动画扩展指南](docs/animation-guide.md)
+- [PRTS 终端功能](docs/operations.md)
+- [故障排查](docs/troubleshooting.md)
 
 ## 录制与验证
 

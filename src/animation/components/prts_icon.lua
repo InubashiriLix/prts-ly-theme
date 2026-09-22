@@ -15,7 +15,7 @@ function M.draw(ctx, b, t, C)
         end
     end
     local count = math.floor(#points * t.emblem)
-    local highlight = math.floor(t.seconds * 3) % #points + 1
+    local highlight = math.floor(t.seconds * 3 * t.speed) % #points + 1
     for i = 1, count do
         local p = points[i]
         local color = t.ready and t.moving and i == highlight and C.orange or C.ink
@@ -23,12 +23,14 @@ function M.draw(ctx, b, t, C)
         ctx:cell(e.x+p[1]+1, e.y+p[2], 0x2588, color)
     end
     if t.emblem > 0.9 then
+        -- The production mark is a diamond frame with a central bar and
+        -- registration ticks, rather than a generic enclosing diamond.
+        ctx:rule(e.x-5, e.y, 11, C.ink)
+        ctx:text(e.x, e.y-3, "|", C.muted)
+        ctx:text(e.x, e.y+3, "|", C.muted)
         if e.radius >= 5 then
             ctx:text(e.x-3, e.y-1, "RHODES", C.bold)
-            ctx:rule(e.x-5, e.y, 11, C.ink)
             ctx:text(e.x-3, e.y+1, "ISLAND", C.bold)
-            ctx:text(e.x, e.y-3, "|", C.muted)
-            ctx:text(e.x, e.y+3, "|", C.muted)
         else
             ctx:text(e.x-1, e.y, "RI", C.bold)
         end
