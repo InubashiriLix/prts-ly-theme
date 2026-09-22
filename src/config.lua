@@ -95,7 +95,7 @@ ly = {
     battery_id = nil,
 
     -- 背景色
-    bg = 0x00070C0E,
+    bg = 0x00E5E7E6,
 
     -- 更改大时钟的状态与语言
     -- none -> 禁用（默认）
@@ -111,10 +111,10 @@ ly = {
 
     -- 主框背景是否填充
     -- 设为 false 会使其透明
-    blank_box = false,
+    blank_box = true,
 
     -- 边框前景色
-    border_fg = 0x0039D5E8,
+    border_fg = 0x001B2023,
 
     -- 相对于屏幕末端的水平位置
     -- 默认：0.5
@@ -255,11 +255,11 @@ ly = {
     edge_margin = 0,
 
     -- 错误信息背景色
-    error_bg = 0x00070C0E,
+    error_bg = 0x00E5E7E6,
 
     -- 错误信息前景色
     -- 默认是红色加粗
-    error_fg = 0x01FF0000,
+    error_fg = 0x01B83F00,
 
     -- pam_faillock 模块的计数目录（如存在）
     -- 用于在登录尝试失败次数过多后判断账号是否被锁定
@@ -267,7 +267,7 @@ ly = {
     faillock_tally_dir = "/var/run/faillock",
 
     -- 前景色
-    fg = 0x00EAF6F7,
+    fg = 0x001B2023,
 
     -- 渲染真彩色（如果支持）
     -- 若为 false，则输出使用八色模式
@@ -481,7 +481,7 @@ ly = {
 
     custom_labels = {
         label = "prts",
-        cmd = "printf 'PRTS // ONLINE'",
+        cmd = "printf 'PRTS // ANALYSIS OS'",
         refresh = 0,
     }
 }

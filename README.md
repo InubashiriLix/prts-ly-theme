@@ -1,55 +1,115 @@
-# PRTS Ly Theme
+# PRTS / Analysis OS — Ly 登录主题
 
-A PRTS / Rhodes Island themed login screen for [Ly](https://github.com/fairyglade/ly) 1.5+.
-It uses Ly's Lua animation API, so no patched binary or desktop environment is required.
+白色 Analysis OS 风格：浅灰白底、黑色几何结构、橙色强调。PRTS 字标、
+菱形 Rhodes Island 徽记和命令条依次入场，随后进入缓慢扫描与呼吸高亮。
+入场不阻塞登录；动画始终避开 Ly 的原生表单及屏幕边缘快捷键。
 
-## Features
+![实际 Ly PTY 输出重建的 120×40 画面](docs/previews/120x40.png)
 
-- Rhodes Island-inspired cyan, slate and amber interface palette
-- Animated scanning telemetry line and compact terminal HUD
-- PRTS authorization copy, branded login box, and safe 24-bit colors
-- A sandbox preview command that never writes to `/etc/ly`
+[启动与待机动图](docs/previews/entrance.gif) · [终端录制](docs/previews/120x40.cast) ·
+[80×24](docs/previews/80x24.png) · [40×15](docs/previews/40x15.png)
 
-## Preview
+图片和 GIF 来自实际 `ly-dm` 输出，经终端解析器回放渲染，并非设计稿或桌面截屏。
+PTY 中的 `failed to get lock state` 提示保留原样；它与动画加载无关。
+
+## 预览与安装
+
+需要支持 Lua 动画的 Ly、Python 3、Bash；测试和安装预检还需要 `luajit`。
+本项目实测版本：`1.6.0-dev.29+60be7ad`。
 
 ```sh
 ./tools/debug_sandbox.sh --check
-./tools/debug_sandbox.sh
+./tools/debug_sandbox.sh              # 在终端内运行，Ctrl+C 退出
 ```
 
-The preview needs `ly-dm`; the login screen is deliberately non-functional in a
-regular terminal, but layout and animation can be inspected safely. Press Ctrl+C
-to leave it.
+预览自动编译模块，并在 `/tmp/prts-ly-preview/run.*` 创建独立配置。
+可通过 `SANDBOX` 指定父目录；脚本不会删除已有目录。
+预览禁用电源快捷键、自动登录、启动脚本、登录信息保存，并使用独立 PAM 服务名。
+这是布局检查环境，请勿在其中尝试实际认证。
 
-For a repeatable TTY capture at the intended 100×30 size (without changing
-`/etc/ly`), first assemble the sandbox, then record it with `script`:
+确认效果后安装：
 
 ```sh
-SANDBOX=/tmp/prts-ly-theme-preview ./tools/debug_sandbox.sh --check
-script -qefc 'stty cols 100 rows 30; ly-dm -c /tmp/prts-ly-theme-preview' \
-  /tmp/prts-ly-theme-100x30.typescript
+sudo ./tools/install.sh               # 安装到 /etc/ly
+./tools/install.sh /tmp/prts-install  # 或指定可写的独立配置目录
 ```
 
-Stop the recording with Ctrl+C and replay it with `scriptreplay` or inspect the
-result in a terminal that supports true colour. For an on-screen screenshot,
-run `./tools/debug_sandbox.sh` from the target TTY and use the system screenshot
-tool; do not capture a real login prompt containing credentials. The HUD switches
-to a minimal top/bottom treatment below 80×24, leaving the centred Ly form clear;
-the 20-column inputs keep Ly's own form inside a 40-column rescue TTY.
+安装器先构建、校验配置并执行动画预检；存在目标目录时先完整备份，
+再复制构建产物。备份路径会输出到终端。安装器不重启服务。
+直接复制 `src` 不能运行：源码中的模块需要先打包。
 
-## Install
+## 修改与扩展
 
-Review the generated backup location, then run:
+`src/animation/anime.lua` 是简短的入口，组件使用普通 Lua 模块写法。
+`theme/color.lua` 管理配色，`theme/options.lua` 控制入场与减少动效；
+`core` 负责时间、布局和绘制，`components` 负责徽记和面板。
+
+```lua
+-- theme/options.lua
+return {
+    entrance = true,        -- false：立即进入待机
+    reduced_motion = false, -- true：直接显示静态完整画面
+}
+```
+
+Ly 没有打开 `package` 库，因此不能依赖系统 `require`。
+打包器将模块嵌入工厂函数，提供局部 `require` 与缓存；运行时不读取文件，
+不需要 `io`、`package`、`loadfile` 或额外进程。
 
 ```sh
-sudo ./tools/install.sh
+python3 tools/build.py                # 输出 build/config.lua 和单文件动画
+python3 tools/test_build.py
+luajit tools/test_animation.lua build/animation/anime.lua
 ```
 
-To install into another Ly configuration directory, pass it as the first argument.
-The installer backs up an existing configuration and validates the new `config.lua`
-before reporting success.
+新增组件示例：
 
-## Layout notes
+```lua
+-- src/animation/components/example.lua
+local M = {}
+function M.draw(ctx, bounds, time, colors)
+    if bounds.mode == "full" and time.ready then
+        ctx:text(bounds.right, 8, "EXAMPLE / READY", colors.muted)
+    end
+end
+return M
+```
 
-The animation keeps the centre open for Ly's login dialog. It adapts to terminal
-size, though 100×30 or larger gives the intended composition.
+将 `components.example` 添加到 `src/animation/modules.txt`，在入口中
+`local example = require("components.example")`，然后在 `draw()` 内调用
+`example.draw(ctx, bounds, time, C)`。重新执行预览即可；不编辑构建产物。
+绘制必须经过 `ctx`，由它保证坐标有效和登录框避让。
+文本使用 ASCII，几何符号通过 `ctx:cell` 传 Unicode 码点。
+配色修改若涉及 Ly 原生表单，也要同步 `src/config.lua`。
+
+## 录制与验证
+
+详细记录见 [验证说明](docs/validation.md)。录制工具额外需要 `pyte==0.8.2`、
+Pillow 和 `fc-match`，这些不是主题运行依赖。
+
+```sh
+python3 -m venv --system-site-packages /tmp/prts-capture-env
+/tmp/prts-capture-env/bin/pip install pyte==0.8.2 Pillow
+/tmp/prts-capture-env/bin/python tools/capture_preview.py \
+  --size 120x40 --gif --output build/capture
+asciinema play build/capture/preview.cast
+```
+
+录制包含 2.4 秒入场和后续待机。`--resize 60x20` 可在录制中途缩放，
+不要与 `--gif` 同用。截图字体由 `fc-match monospace` 决定。
+也可在交互终端使用 `script --log-out OUTPUT --log-timing TIMING` 录制，
+再执行 `scriptreplay --log-out OUTPUT --log-timing TIMING` 回放。
+
+布局在 100×30 及以上显示完整构图，80×24 显示简化徽记，小于该尺寸时
+优先保留表单。40×15 是当前配置实测的最小完整表单尺寸；更小尺寸只保证
+动画不越界，Ly 自身表单可能被裁切。
+
+## 设计参考
+
+- [官方 Doctor’s Notes](https://x.com/ArknightsEN/status/1854780899780616656)：浅色终端、黑色命令条、橙色强调、菱形徽记。
+- [Mashiro 的 Arknights UI 复刻](https://github.com/mashirozx/arknights-ui)：面板层级和信息排版。
+- [PRTS Plymouth](https://github.com/LS-KR/prts-plymouth)：PRTS 启动动画的参考项目。
+
+本项目使用自行绘制的字符几何，不包含上述项目的图片或动画帧。
+主题为非官方同人作品。Ly 的动画接口只有尺寸、时钟和绘图能力，
+不提供认证事件；状态文案不会伪装为密码验证结果或真实系统遥测。
