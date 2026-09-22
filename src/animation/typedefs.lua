@@ -1,0 +1,7 @@
+---@class ly_t
+---@field height number
+---@field width number
+---@field putCell fun(byte: number, fg: number, bg: number, x: number, y: number)
+---@field putRect fun(str: string, fg: number, bg: number, x: number, y: number, w: number, h: number)
+---@field putLabel fun(str: string, fg: number, bg: number, x: number, y: number)
+---@field clock fun(): number

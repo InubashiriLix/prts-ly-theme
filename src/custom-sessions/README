@@ -1,0 +1,22 @@
+自定义会话就是一个桌面条目（desktop entry）文件，格式和 X11、Wayland
+会话所用的完全一样。例如：
+
+[Desktop Entry]
+Name=Fish shell
+Exec=/usr/bin/fish
+DesktopNames=null
+Terminal=true
+
+DesktopNames 的值是可选的，它会设置 XDG_SESSION_DESKTOP 和
+XDG_CURRENT_DESKTOP 这两个环境变量。若其值为 null 或该字段不存在，
+则不会设置 XDG_SESSION_DESKTOP 和 XDG_CURRENT_DESKTOP。除此之外，
+其语法与 Freedesktop 桌面条目规范（Desktop Entry Specification）
+中所述的相同。
+
+Terminal 的值用于指定标准输出和标准错误是否应重定向到 Ly 配置文件中
+指定的会话日志文件。若设为 true，Ly 会认为该程序将在 TTY 中运行，
+因此不会重定向标准输出和标准错误。该字段可选，默认值为 false。
+
+最后请注意：若 Terminal 的值设为 true，环境变量 XDG_SESSION_TYPE
+会被设为 "tty"；否则会被设为 "unspecified"（不带引号），这是至少
+systemd 能够识别的行为（参见 pam_systemd 的 man 手册）。
