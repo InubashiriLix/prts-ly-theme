@@ -1,18 +1,20 @@
 local M = {}
 
 local letters = {
-    {"1110", "1001", "1110", "1000", "1000"},
-    {"1110", "1001", "1110", "1010", "1001"},
-    {"1111", "0110", "0110", "0110", "0110"},
-    {"1111", "1000", "1111", "0001", "1111"},
+    -- 5x5 display glyphs: cleaner counters and a shared baseline than the
+    -- original 4x5 shapes, while remaining legible on small TTYs.
+    {"11110", "10001", "11110", "10000", "10000"}, -- P
+    {"11110", "10001", "11110", "10100", "10010"}, -- R
+    {"11111", "00100", "00100", "00100", "00100"}, -- T
+    {"01111", "10000", "01110", "00001", "11110"}, -- S
 }
 
 local function wordmark(ctx, t, C)
     for i, glyph in ipairs(letters) do
         for row = 1, 5 do
-            for col = 1, 4 do
+            for col = 1, 5 do
                 local x = 7 + (i-1)*6 + col-1
-                if glyph[row]:sub(col,col) == "1" and x <= 7+22*t.rules then
+                if glyph[row]:sub(col,col) == "1" and x <= 7+23*t.rules then
                     ctx:cell(x, row, 0x2588, C.ink)
                 end
             end

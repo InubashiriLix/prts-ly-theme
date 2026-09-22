@@ -338,8 +338,9 @@ ly = {
     -- 若为 null，信息行默认显示主机名
     initial_info_text = "PRIESTESS LINK // MEMORY AWAKENED.",
 
-    -- 输入框长度。20 可让 Ly 自身的主框落入 40 列的救援 TTY。
-    input_len = 20,
+    -- 输入框长度。28 给用户名/密码和长用户名留出更充裕的空间。
+    -- Ly 会在极窄终端自动压缩主框；动画在 40 列模式仍会隐藏装饰。
+    input_len = 28,
 
     -- 当前语言
     -- 可用语言位于 /etc/ly/lang/
