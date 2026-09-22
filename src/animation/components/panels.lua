@@ -26,6 +26,26 @@ local function accent(C, mode)
     return mode == "cyan" and C.cyan or C.orange
 end
 
+local function micro_panel(ctx, x, y, width, title, value, C, highlight)
+    ctx:text(x, y, title, C.muted)
+    ctx:rule(x, y + 1, width, C.grid)
+    ctx:bar(x, y + 2, width, value, C.white, highlight and C.ink or C.muted)
+end
+
+local function telemetry(ctx, b, t, C, highlight)
+    if b.mode ~= "full" or t.density == "sparse" then return end
+    -- Use the otherwise empty margins as a quiet instrument readout.  The
+    -- center exclusion zone belongs to Ly's native login form.
+    micro_panel(ctx, 3, 8, 25, "MEMORY / 04", "ARCHIVE  86%", C, false)
+    micro_panel(ctx, 3, 29, 25, "LINK / PRIESTESS", t.ready and "AWAKE  100%" or "WAKING  ...", C, t.ready)
+    ctx:text(3, 33, "NODES  04   CACHE  12", C.muted)
+    ctx:cell(27, 33, 0x25A0, highlight)
+
+    micro_panel(ctx, b.right, 29, b.w - b.right - 3,
+        "SYNCHRONIZATION", t.ready and "STABLE  98.4" or "NEGOTIATING", C, t.ready)
+    ctx:text(b.right, 33, "R.I. // ANALYSIS CHANNEL", C.muted)
+end
+
 function M.draw(ctx, b, t, C)
     local highlight = accent(C, t.accent_mode)
     if b.mode == "compact" then
@@ -70,6 +90,7 @@ function M.draw(ctx, b, t, C)
         ctx:bar(3, b.h-3, math.floor((b.w-6)*t.panels),
                 "> OPERATOR AUTHORIZATION REQUIRED", C.white, C.ink)
     end
+    telemetry(ctx, b, t, C, highlight)
     ctx:rule(2, b.h-2, math.floor((b.w-4)*t.rules), C.muted)
     if t.ready then
         local pulse = math.floor(150+60*t.pulse)*65536 + 70*256 + 12
