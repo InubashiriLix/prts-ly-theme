@@ -11,7 +11,9 @@
 
 参考画面包括官方 [Doctor’s Notes 终端](https://x.com/ArknightsEN/status/1854780899780616656)、
 [PRTS Connection 界面](https://arknights.wikiru.jp/?PRTS) 与
-[Analysis OS 启动画面](https://ecywang.com/pic/prts%E5%9B%BE%E6%A0%87/)。
+[Analysis OS 启动画面](https://ecywang.com/pic/prts%E5%9B%BE%E6%A0%87/)，以及
+[mashirozx/arknights-ui](https://github.com/mashirozx/arknights-ui) 的加载器、半透明面板和高对比强调色。
+这里只借鉴布局语言和动画节奏，不打包该项目的逆向游戏贴图；仓库作者也注明那些素材仅供学习使用。
 
 ## 修改图标
 

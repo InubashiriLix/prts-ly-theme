@@ -24,9 +24,14 @@ if [[ -e "$TARGET" ]]; then
 fi
 mkdir -p "$TARGET"
 cp -a "$STAGE/." "$TARGET/"
-# `cp -a` copies the staging directory's own mode onto TARGET; force the
-# deployed root back to a traversable mode so it is not 0700 root-only.
-chmod 0755 "$TARGET"
+# `cp -a` preserves source modes (the checkout may mark config files
+# executable), so normalize the deployed tree: directories must be
+# traversable, data/configuration readable, and only the two Ly hooks
+# executable.  This avoids both permission-denied startup failures and
+# accidentally executable configuration files.
+find "$TARGET" -type d -exec chmod 0755 {} +
+find "$TARGET" -type f -exec chmod 0644 {} +
+chmod 0755 "$TARGET/setup.sh" "$TARGET/startup.sh"
 if [[ ! -r "$TARGET/setup.sh" || ! -x "$TARGET/setup.sh" ]]; then
     echo "Installed $TARGET/setup.sh is not readable/executable by the greeter." >&2
     exit 1

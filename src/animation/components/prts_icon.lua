@@ -1,5 +1,21 @@
 local M = {}
 
+local function registration_mark(ctx, e, C)
+    -- The in-game mark is not a plain RI monogram: a small geometric
+    -- Rhodes Island device sits behind the horizontal nameplate.  These
+    -- terminal-safe pixels preserve that silhouette without external assets.
+    local dark = C.ink
+    local muted = C.muted
+    ctx:cell(e.x - 4, e.y - 2, 0x2588, muted)
+    ctx:cell(e.x + 3, e.y - 2, 0x2588, muted)
+    ctx:cell(e.x - 3, e.y - 1, 0x2588, dark)
+    ctx:cell(e.x + 2, e.y - 1, 0x2588, dark)
+    ctx:cell(e.x - 3, e.y + 1, 0x2588, dark)
+    ctx:cell(e.x + 2, e.y + 1, 0x2588, dark)
+    ctx:cell(e.x - 4, e.y + 2, 0x2588, muted)
+    ctx:cell(e.x + 3, e.y + 2, 0x2588, muted)
+end
+
 function M.draw(ctx, b, t, C)
     if b.mode == "compact" then return end
     local e, points = b.emblem, {}
@@ -23,8 +39,9 @@ function M.draw(ctx, b, t, C)
         ctx:cell(e.x+p[1]+1, e.y+p[2], 0x2588, color)
     end
     if t.emblem > 0.9 then
-        -- The production mark is a diamond frame with a central bar and
-        -- registration ticks, rather than a generic enclosing diamond.
+        -- The production mark is a diamond frame with an inner device and a
+        -- central Rhodes Island nameplate, rather than a generic diamond.
+        if e.radius >= 5 then registration_mark(ctx, e, C) end
         ctx:rule(e.x-5, e.y, 11, C.ink)
         ctx:text(e.x, e.y-3, "|", C.muted)
         ctx:text(e.x, e.y+3, "|", C.muted)
@@ -36,7 +53,8 @@ function M.draw(ctx, b, t, C)
         end
     end
     if b.mode == "full" and t.ready then
-        ctx:text(3, b.h-6, "R.I. / TERMINAL 01", C.muted)
+        ctx:cell(3, b.h-6, 0x25B3, C.muted)
+        ctx:text(5, b.h-6, "CONNECTION: REQUEST 0000", C.muted)
     end
 end
 
