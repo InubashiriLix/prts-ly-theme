@@ -15,6 +15,17 @@ sudo -u nobody test -x /etc/ly/setup.sh
 不要把动画文件设为 root 私有的 0700；目录需要至少 0755，普通文件需要可读，
 两个启动脚本需要可执行。安装器会保留带时间戳的备份。
 
+## 直接热加载到 TTY1
+
+```sh
+cd /home/inubashiri/proj/sys/prts-ly-theme
+sudo ./tools/hot_reload.sh
+```
+
+脚本会先完成构建和备份，再检测并重启 `ly@tty1.service` 或
+`ly-kmsconvt@tty1.service`。它不会重启错误的服务；如果 tty1 没有活动的 Ly，
+只安装文件并报告原因。
+
 ## 动画加载失败
 
 ```sh

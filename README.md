@@ -32,10 +32,13 @@ PTY 中的 `failed to get lock state` 提示保留原样；它与动画加载无
 ```sh
 sudo ./tools/install.sh               # 安装到 /etc/ly
 ./tools/install.sh /tmp/prts-install  # 或指定可写的独立配置目录
+sudo ./tools/hot_reload.sh             # 安装并重启当前 tty1 上的 Ly
 ```
 
 安装器先构建、校验配置并执行动画预检；存在目标目录时先完整备份，
 再复制构建产物。备份路径会输出到终端。安装器不重启服务。
+`hot_reload.sh` 会检测活动的 `ly@tty1` 或 `ly-kmsconvt@tty1`，重启对应服务
+并再次校验配置；这会替换当前 tty1 会话。
 直接复制 `src` 不能运行：源码中的模块需要先打包。
 
 ## 字体
