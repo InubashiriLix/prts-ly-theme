@@ -14,7 +14,29 @@ if [[ "$TARGET" != "/etc/ly" ]]; then
     exit 2
 fi
 
+graphical_session_on_tty1() {
+    command -v loginctl >/dev/null 2>&1 || return 1
+    while read -r session _uid _user _seat tty _rest; do
+        [[ "$tty" == "tty1" ]] || continue
+        case "$(loginctl show-session "$session" -p Type --value 2>/dev/null || true)" in
+            wayland|x11) return 0 ;;
+        esac
+    done < <(loginctl list-sessions --no-legend 2>/dev/null || true)
+    return 1
+}
+
+had_graphical_session=0
+if graphical_session_on_tty1; then
+    had_graphical_session=1
+    echo "Active graphical session detected on tty1; files will be installed without restarting Ly." >&2
+    echo "Log out/reboot, then run this script again from a non-graphical shell to hot-reload safely." >&2
+fi
+
 bash "$ROOT/tools/install.sh" "$TARGET"
+
+if [[ "$had_graphical_session" -eq 1 ]]; then
+    exit 4
+fi
 
 active_unit=""
 for unit in ly-kmsconvt@tty1.service ly@tty1.service; do

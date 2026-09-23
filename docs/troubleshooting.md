@@ -26,6 +26,14 @@ sudo ./tools/hot_reload.sh
 `ly-kmsconvt@tty1.service`。它不会重启错误的服务；如果 tty1 没有活动的 Ly，
 只安装文件并报告原因。
 
+不要在正在运行 Niri/Wayland 桌面的同一会话里重启 Ly。旧的用户级
+`niri.service` 可能继续运行，下一次 `niri-session` 会因检测到已有实例而退出，
+表现为“密码正确但登录失败”。新版脚本检测到 tty1 上的图形会话时只安装、不重启，
+并返回状态码 4；注销或重启后，从非图形 shell 再运行一次即可。
+
+如果已经遇到这个状态，可在另一个 TTY 的用户 shell 中执行
+`systemctl --user stop niri.service`，或直接重启系统，再回到 Ly 登录。
+
 ## 动画加载失败
 
 ```sh
